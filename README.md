@@ -100,4 +100,7 @@ Please read [Contributions.md](https://gist.github.com/Ralphkay/1025f03a39e42879
 This project is licensed under the MIT License
 
 ### Author
-Raphael Amponsah and the graceful developers to contribute
+Raphael Amponsah and all the graceful developers who would be contributing
+
+### Acknowlegement
+All through whom i have learnt, the blogs, articles, video tutorials, tweets; I am most grateful with all the Wrauth in me!
