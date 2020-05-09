@@ -48,5 +48,10 @@ const options = {
     password: {minlength:7}
 }
 
-wrauth.initialize()
+wrauth.initialize(options) //wrauth.initialize()
+```
+### Activate
+The ```activate()``` method, well, activates the Wrauth router. This sets the router in operation.
+```
+app.use('/auth',wrauth.activate());
 ```
