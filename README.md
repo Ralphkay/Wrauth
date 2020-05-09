@@ -11,7 +11,7 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 * Deactivating a user account
 * Deleting a user account
 
-##Table of Contents
+#Table of Contents
 - [Installation](##installation)
 - [Setup](##setup)
 - [Initialize](##initialize)
