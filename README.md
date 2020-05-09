@@ -17,6 +17,10 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 - [Initialize](#initialize)
 - [Activate](#activate)
 - [Guards](#guards)
+    -[Guard Types](#guard-types)
+        * ProtectRoute
+        * ProtectRouteByACL
+        
 
 <!-- toc -->
 
@@ -55,3 +59,10 @@ The ```activate()``` method, well, activates the Wrauth router. This sets the ro
 ```
 app.use('/auth',wrauth.activate());
 ```
+
+### Guards
+The ```.guard()``` method takes a magic string parameter that represents the type of guard. The guard is a middleware that protects the route or resource.
+
+#### Guard Types
+[Currently] There are two main types of guards
+
