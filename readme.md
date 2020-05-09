@@ -69,6 +69,6 @@ The ```.guard()``` method takes a magic string parameter that represents the typ
 [Currently] There are two main types of guards
 
 ##### ProtectRoute
-This function protects the route by checking if the user maiking the request is authenticated.
+This function protects the route by checking if the user maiking the request is authenticated.  
 ```app.get('/show',wrauth.guard('protectRoute'),function(req, res, next){res.json({"data":req.user})})```
 
