@@ -15,6 +15,7 @@ Wrauth is a mongoose-based restful api authentication and user management framew
         - [ProtectRoute](#protectroute)
     - [License](#license)
     - [Author](#author)
+    - [Acknowlegement](#acknowledegement)
         
 
 <!-- toc -->
