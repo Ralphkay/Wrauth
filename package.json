@@ -1,13 +1,13 @@
 {
   "name": "wrauth",
   "version": "1.0.1",
-  "description": "",
+  "description": "Wrauth is a mongoose-based restful api authentication and user management framework, implemented for Mongoose and Mongodb based node application.",
   "main": "index.js",
   "scripts": {
     "start": ""
   },
   "keywords": [],
-  "author": "",
+  "author": "Raphael Amponsah",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
