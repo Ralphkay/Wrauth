@@ -21,8 +21,21 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 <!-- toc -->
 
 ### Installation
-Pull the package from npm
+Pull the package from npm.
 
 ```
 npm install wrauth
+```
+
+### Setup
+
+```
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
+const wrauth = require('./wrauth');
+const app = express();
+app.use(express.json());
+app.use(cookieParser()); 
+
 ```
