@@ -7,17 +7,6 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 * Authentication using jwt(Both stateless and using cookies)
 * Authorisation by ACL
 * Set ACL on route level with validation at the the middleware and mongodb levels
-* AuthUser Schema Attributes
-  * email
-  * username
-  * password
-  * role
-  * verified
-  * resetPasswordToken
-  * resetPasswordTokenExpiryDate
-  * confirmationToken
-  * confirmationTokenExpiryDate
-  * profile_photo
 * Update User Account
 * Deactivating a user account
 * Deleting a user account
