@@ -88,7 +88,8 @@ This function protects the route by checking if the user maiking the request is 
 ```
 app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})
 ```
-
+#### Contributing
+Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests to us.
 
 ### License
 This project is licensed under the MIT License
