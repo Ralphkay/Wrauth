@@ -12,13 +12,16 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 * Deleting a user account
 
 ## Table of Contents
-- [Installation](#installation)
-- [Setup](#setup)
-- [Initialize](#initialize)
-- [Activate](#activate)
-- [Guards](#guards)
-  * [ProtectRoute](#protectroute)
-  * [ProtectRouteByACL](#protectroutebyacl)
+- [Wrauth](#wrauth)
+  - [**Features**](#features)
+  - [Table of Contents](#table-of-contents)
+    - [Installation](#installation)
+    - [Setup](#setup)
+    - [Initialize](#initialize)
+    - [Activate](#activate)
+    - [Guards](#guards)
+      - [Guard Types](#guard-types)
+        - [ProtectRoute](#protectroute)
         
 
 <!-- toc -->
@@ -64,4 +67,8 @@ The ```.guard()``` method takes a magic string parameter that represents the typ
 
 #### Guard Types
 [Currently] There are two main types of guards
+
+##### ProtectRoute
+This function protects the route by checking if the user maiking the request is authenticated.
+```app.get('/show',wrauth.guard('protectRoute'),function(req, res, next){res.json({"data":req.user})})```
 
