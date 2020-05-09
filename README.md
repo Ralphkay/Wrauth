@@ -90,6 +90,7 @@ app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, re
 ```
 
 
-### Versioning
+### License
+This project is licensed under the MIT License
 
 ### Author
