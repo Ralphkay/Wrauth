@@ -13,7 +13,7 @@ Wrauth is a mongoose-based restful api authentication and user management framew
     - [**Guards**](#guards)
       - [**Guard Types**](#guard-types)
         - [ProtectRoute](#protectroute)
-    - [Versioning](#versioning)
+    - [License](#license)
     - [Author](#author)
         
 
@@ -95,4 +95,4 @@ Please read [Contributions.md](https://gist.github.com/Ralphkay/1025f03a39e42879
 This project is licensed under the MIT License
 
 ### Author
-Raphael Amponsah
+Raphael Amponsah and the graceful developers to contribute
