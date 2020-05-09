@@ -22,6 +22,7 @@ Wrauth is a mongoose-based restful api authentication and user management framew
     - [Guards](#guards)
       - [Guard Types](#guard-types)
         - [ProtectRoute](#protectroute)
+    - [Authors](#authors)
         
 
 <!-- toc -->
@@ -76,6 +77,6 @@ This function protects the route by checking if the user maiking the request is 
 ##### ProtectRouteByACL
 This function protects the route by checking if the user maiking the request is authenticated and satisfy a specific role or roles passed as a second parameter to the function. Ensure that there are no spaces between the second string parapemter and it must be in the predefined list. The roles that come with Wrauth by default are ```'admin'``` and ```'guest'```  
 
-```app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})})```
+
 
 
