@@ -64,6 +64,7 @@ wrauth.initialize(options) //wrauth.initialize()
 ```
 ### **Activate**
 The ```activate()``` method, well, activates the Wrauth router. This sets the router in operation.
+
 ```
 app.use('/auth',wrauth.activate());
 ```
@@ -78,12 +79,15 @@ The ```.guard()``` method takes a magic string parameter that represents the typ
 This function protects the route by checking if the user maiking the request is authenticated.  
 
 ```
-app.get('/show',wrauth.guard('protectRoute'),function(req, res, next){res.json({"data":req.user})})```
+app.get('/show',wrauth.guard('protectRoute'),function(req, res, next){res.json({"data":req.user})})
+```
 
 ##### ProtectRouteByACL
 This function protects the route by checking if the user maiking the request is authenticated and satisfy a specific role or roles passed as a second parameter to the function. Ensure that there are no spaces between the second string parapemter and it must be in the predefined list. The roles that come with Wrauth by default are ```'admin'``` and ```'guest'```     
 
-```app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})```
+```
+app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})
+```
 
 
 ### Versioning
