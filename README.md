@@ -28,9 +28,14 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 * Deactivating a user account
 * Deleting a user account
 
-### **Getting Started***
+### **Getting Started**
+These instructions will get you a copy of Wrauth up and running on your local machine for local or production environment. Following the instructions is as simple as a cookie. 
 
-
+### Prerequisites
+* nodejs
+* expressjs
+* mongoosejs
+* cookie-parser (if you would require stateful authentication)
 
 ### **Installation**
 Pull the package from npm.
