@@ -39,3 +39,14 @@ app.use(express.json());
 app.use(cookieParser()); 
 
 ```
+
+### Initialize
+The ```initialize()``` method takes an optional parameter that describes the options for the auth-schema.   
+```
+const options = {
+    roles:['admin','guest'],
+    password: {minlength:7}
+}
+
+wrauth.initialize()
+```
