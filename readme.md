@@ -79,3 +79,4 @@ This function protects the route by checking if the user maiking the request is 
 ```app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})})```
 
 
+We use SemVer for versioning. For the versions available, see the tags on this repository.
