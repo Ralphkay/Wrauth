@@ -66,9 +66,16 @@ app.use('/auth',wrauth.activate());
 The ```.guard()``` method takes a magic string parameter that represents the type of guard. The guard is a middleware that protects the route or resource.
 
 #### Guard Types
-[Currently] There are two main types of guards
+[Currently] There are two main types of guards which are middlewares. For each of the guards you can access the user from the next function as explained below.
 
 ##### ProtectRoute
 This function protects the route by checking if the user maiking the request is authenticated.  
+
 ```app.get('/show',wrauth.guard('protectRoute'),function(req, res, next){res.json({"data":req.user})})```
+
+##### ProtectRouteByACL
+This function protects the route by checking if the user maiking the request is authenticated and satisfy a specific role or roles passed as a second parameter to the function. Ensure that there are no spaces between the second string parapemter and it must be in the predefined list. The roles that come with Wrauth by default are ```'admin'``` and ```'guest'```  
+
+```app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})})```
+
 
