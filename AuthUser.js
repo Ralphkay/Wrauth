@@ -3,7 +3,7 @@
  * AuthUser Model
  * ===========================================
  * This is the authentication user model based
- * on the AuthUserSchema
+ * on the Auth User Schema
  * -------------------------------------------
  * 
  * 

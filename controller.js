@@ -5,31 +5,6 @@ const {defaultConfigOptions} = require('./config');
 const bcrypt = require('bcryptjs');
 
 
-/**
- * loginUserWithEmail
- * ******************
- * @function
- * This controller log the user in using the email and password
- * @HttpRequest [POST]
- * @param {model} model 
- * @return async function(req,res,next)
- */
-const loginUserWithEmail = function(model){
-    return async (req,res,next)=>{
-        if(!req.body.email || !req.body.password){
-            res.status(403).json({message:"Knight! enter thy credentials or face thy Wrauth!"})
-        }
-    
-        const userExist = await model.findOne({email:req.body.email}).select('+password');
-        if(!userExist){return res.status(404).json({message:"Hahaha! The Wrauth doesn't know you!"})};
-        if(userExist.accountStatus.active == true){userExist.accountStatus.active = false; 
-            sendmail("Account Activated!","Welcome back, you have activated your account.",userExist.email)}
-        const match =  await bcrypt.compare(req.body.password,userExist.password);
-        if(!match){return res.status(404).json({message:"Thy credentials are not in thy testament!"})};
-        storeTokenCookie(userExist,res,200)
-        next()
-    }
-}
 
 /**
  * registerUser
@@ -43,19 +18,39 @@ const loginUserWithEmail = function(model){
  */
 const registerUser = function(model){
     return async (req, res, next)=>{
-    
-        await model.create(req.body)
-                          .then(user=>{
-                            generateEmailConfirmationLink(user, req,res, next);
-                            storeTokenCookie(user,res,200)
-                              user.save(function (err) {
-                                  if (err) {res.status(401).json({message:err.message})}   
-                              })
-                          }).catch(err=>res.status(401).json({message:err.message}))
-                        
-                      }
-                    next()
+        const user  = await model.create(req.body);
+        if(!user){res.status(401).end("Problem with creating new user")}
+        generateEmailConfirmationLink(user, req,res, next);
+        storeTokenCookie(user,res,200);
+        next()                     
+    }
 }
+
+/**
+ * loginUserWithEmail
+ * ******************
+ * @function
+ * This controller log the user in using the email and password
+ * @HttpRequest [POST]
+ * @param {model} model 
+ * @return async function(req,res,next)
+ */
+const loginUserWithEmail = function(model){
+    return async (req,res,next)=>{
+        if(!req.body.email || !req.body.password){
+            res.status(403).end("Knight! enter thy credentials or face thy Wrauth!")
+        }
+        const userExist = await model.findOne({email:req.body.email}).select('+password');
+        if(!userExist){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")};
+        if(userExist.accountStatus.active == true){userExist.accountStatus.active = false; 
+            sendmail("Account Activated!","Welcome back, you have activated your account.",userExist.email)}
+        const match =  await bcrypt.compare(req.body.password,userExist.password);
+        if(!match){return res.status(404).end("Thy credentials are not in thy testament!")};
+        storeTokenCookie(userExist,res,200)
+        next()
+    }
+}
+
 
 /**
  * generatePasswordResetLink
@@ -69,9 +64,9 @@ const registerUser = function(model){
 const generatePasswordResetLink = function(model){
    return async (req, res,next)=>{
 
-        if(!req.body.email){res.status(405).json({message:"Behold an empty email!"})};
+        if(!req.body.email){res.status(405).end("Behold an empty email!")};
         const user = await model.findOne({"email":req.body.email}).select('+password');
-        if(!user){res.status(405).json({message:"The Great Wrauth doesnt know you!"})}
+        if(!user){res.status(405).end("The Great Wrauth doesnt know you!")}
         const resetToken =  user.getResetPasswordToken();
         const resetPasswordUrl = `${req.protocol}://${req.get('host')}/user/resetpassword/${resetToken}`;
         const message = `You are receiving this email because you (or someone else) requested the reset of a password. Please make a PUT request to:${resetPasswordUrl}`;
@@ -81,7 +76,6 @@ const generatePasswordResetLink = function(model){
         next();
     }
 }
-
 
 /**
  * generateEmailConfirmationLink
@@ -96,12 +90,11 @@ const generatePasswordResetLink = function(model){
  * @param {func} callback 
  * @return async function(req,res,next)
  */
-const generateEmailConfirmationLink = async function(user, req, res, next){
-    const confirmationToken = user.getEmailConfirmationLink();
+const generateEmailConfirmationLink = async function(user, req, res){
+    const confirmationToken = user.getEmailConfirmationToken();
     const confirmationUrl = `${req.protocol}://${req.get('host')}/user/confirmationlink/${confirmationToken}`;
     const message = `You are receiving this email because you (or someone else) sign-up with us. Please make a PUT request to:${confirmationUrl}`;
     sendmail(defaultConfigOptions.emailCredentials.CONFIRMATION_SUBJECT,message,user.email);
-    next()
 }
 
 /**
@@ -119,14 +112,14 @@ const verifyEmail = function(model){
         const reqToken = req.params.token;
         const currentDate = moment();
         const foundUser = await model.findOne({"confirmationToken":reqToken}).select('+password');
-        if(!foundUser){return res.status(404).json({message:"Hahaha! The Wrauth doesn't know you!"})}
+        if(!foundUser){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")}
             // check if time has expired
             if(moment(foundUser.confirmationTokenExpiryDate)-currentDate<0){ 
-                {return res.status(404).json({message:"Confirmation Link expired"})}
+                {return res.status(404).end("Confirmation Link expired")}
             }
             foundUser.verified = true;
             foundUser.save(function (err){
-                console.log(err)
+                res.status(404).end("Failue in saving: "+err.message)
                 res.status(200).json(
             { foundUser,message:"User email verified" }
           )
@@ -147,24 +140,28 @@ const resetPassword = function(model){
    return async function(req,res,next){
 
         if(!req.body.password || !req.body.email){
-            {return res.status(404).json({message:"Email or Password Required"})}
+            {return res.status(404).end("Email or Password Required")}
         }   
         const reqToken = req.params.token;
         const currentDate = moment();
         const foundUser = await model.findOne({"resetPasswordToken":reqToken}).select('+password');
-        if(!foundUser){return res.status(404).json({message:"Hahaha! The Wrauth doesn't know you!"})}
+        if(!foundUser){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")}
             // check if time has expired
             if(moment(foundUser.resetPasswordTokenExpiryDate)-currentDate<0){ 
-                {return res.status(404).json({message:"Token expired"})}
+                {return res.status(404).end("Token expired")}
             }
            
             foundUser.password = req.body.password.trim();
             foundUser.save(function (err){
-                console.log(err)
-                res.status(200).json(
-            { foundUser,message:"User Password: updated" }
-          )
+                if(err){res.status(404).end(err.message)}else{
+                    res.status(200).json(
+                { foundUser,message:"User Password: updated" }
+              )
+                }
+              
             })
+
+            
     
     }
 }
@@ -191,18 +188,18 @@ const getUserAccount = function(model){
    
            jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
                 if (err) {
-                    res.status(401).json({
-                        message: `Aww Snap, there was something worng: ${err.message}`,
-                    });
+                    res.status(401).end(
+                        `Aww Snap, there was something worng: ${err.message}`,
+                    );
                 }
                 model.findById(decoded._id).then(user => {
                     res.status(200).json({ "userAccount": user });
                     next();
                 })
                     .catch(err => {
-                        res.status(401).json({
-                            message: `Not authorised ${err.message}`,
-                        });
+                        res.status(401).end(
+                            `Not authorised ${err.message}`,
+                        );
                     });
             });
        }
@@ -244,7 +241,7 @@ const updateUserAccount = function(model){
            }
            user.save(function (err){
                if(err){
-               res.status(403).json({message:"Jogger, there was an error in saving: "+err.message})
+               res.status(403).end("Jogger, there was an error in saving: "+err.message)
             }else{
                 res.status(200).json({user})
     
@@ -252,7 +249,7 @@ const updateUserAccount = function(model){
             
         })
        } catch (error) {
-           res.status(408).json({message:"There was a fatal error: "+error.message})
+           res.status(408).end("There was a fatal error: "+error.message)
        }
     }
     }
@@ -292,18 +289,16 @@ const deactivateUserAccount = function(model){
                 }
                 user.save((err)=>{           
                     if (err) {
-                        res.status(401).json({
-                            message: `Aww Snap, there was something worng: ${err.message}`,
-                        });
+                        res.status(401).end(`Aww Snap, there was something worng: ${err.message}`,
+                        );
                     }
                     // res.status(204).json({message:"User deactivated successfully"})
                 });
                 res.status(200).json({ "userAccount": user });
                  next();
              }).catch(err => {
-                     res.status(401).json({
-                         message: `Not authorised ${err.message}`,
-                     });
+                     res.status(401).end( `Not authorised ${err.message}`,
+                     );
                  });
          });
     }
@@ -326,7 +321,6 @@ const deactivateUserAccount = function(model){
  */
 const deleteUserAccount = function(model){
     return async function(req, res, next){
-
         if (
             req.headers.authorization &&
             req.headers.authorization.startsWith('Bearer')
@@ -337,9 +331,8 @@ const deleteUserAccount = function(model){
     
         jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
              if (err) {
-                 res.status(401).json({
-                     message: `Aww Snap, there was something worng: ${err.message}`,
-                 });
+                 res.status(401).end( `Aww Snap, there was something worng: ${err.message}`,
+                 );
              }
              model.findById(decoded._id).then(user => {
                  user.accountStatus.deleted = true;
@@ -348,7 +341,7 @@ const deleteUserAccount = function(model){
                      sendmail("Oh no! Account Deleted!","Sorry you had to leave, you have deleted your account. can you please complete this survey to tell us why?",user.email);
                  }
                  user.save((err)=>{
-                     err?res.status(401).json({message:"Error in saving"}):res.status(204).json({message:"User deleted successfully"})
+                     err?res.status(401).end("Error in saving"):res.status(204).json({message:"User deleted successfully"})
                  });
     
     
@@ -406,7 +399,7 @@ function storeTokenCookie(user,res,statuscode){
 const authCtrl = (model)=>{
     return {
         verifyEmail:verifyEmail(model),
-        ç:loginUserWithEmail(model),
+        loginUserWithEmail:loginUserWithEmail(model),
         registerUser:registerUser(model),
         generatePasswordResetLink:generatePasswordResetLink(model),
         resetPassword:resetPassword(model),

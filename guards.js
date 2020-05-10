@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 
+
 const guards = {
         protectRouteByACL:function(model,options) {
             // const args = arguments;
@@ -74,8 +75,8 @@ const guards = {
                 });
             }else{
                 res.status(403).json(
-                    { message:"You are not allowed here." }
-                )
+    { message:"You are not allowed here." }
+  )
             }
         };
         }

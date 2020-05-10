@@ -49,7 +49,7 @@ let defaultConfigOptions = {
         activeState:false
     },
     deletionMechanism:{
-        // softDeletion:true, //default
+        softDeletion:true, //default
         legacyDeletion:false //default
     }
 }
