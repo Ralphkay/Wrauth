@@ -1,10 +1,15 @@
 # Wrauth
+<<<<<<< HEAD
 Wrauth is a mongoose-based restful api authentication and user management framework, implemented for Mongoose and Mongodb based node application. It comes with sensible defaults and is built for both stateless and stateful authentication using cookies. MongoDB is one key nosql database that is used by many to build a lot off applications,   It is important to understand the focus here; the process of developing a straight-forward user authentication and authorisation system packages for restful apis for mongodb and mongoosejs are sparsely composed or available. This is what Wrauth seeks to achieve. A simple auth strategy based on jwt that works well with [MongoDB](https://www.mongodb.com/) and [Mongoosejs](https://mongoosejs.com/).
+=======
+Wrauth is a mongoose-based restful api authentication and user management *framework*, implemented for Mongoose and Mongodb based node application. It comes with sensible defaults and is built for both stateless and stateful authentication using cookies. MongoDB is one key nosql database that is used by many to build a lot off applications,   It is important to understand the focus here; the process of developing a straight-forward user authentication and authorisation system packages for restful apis for mongodb and mongoosejs are sparsely composed or available. This is what Wrauth seeks to achieve. A simple auth strategy based on jwt that works well with [MongoDB](https://www.mongodb.com/) and [Mongoosejs](https://mongoosejs.com/).
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 
 ## Table of Contents
 - [Wrauth](#wrauth)
   - [Table of Contents](#table-of-contents)
   - [**Features**](#features)
+<<<<<<< HEAD
     - [**Getting Started**](#getting-started)
     - [Prerequisites](#prerequisites)
     - [**Installation**](#installation)
@@ -20,6 +25,19 @@ Wrauth is a mongoose-based restful api authentication and user management framew
     - [License](#license)
     - [Author](#author)
     - [Acknowlegement](#acknowlegement)
+=======
+    - [**Getting Started***](#getting-started)
+    - [**Installation**](#installation)
+    - [**Setup**](#setup)
+    - [**Initialize**](#initialize)
+    - [**Activate**](#activate)
+    - [**Guards**](#guards)
+      - [**Guard Types**](#guard-types)
+        - [ProtectRoute](#protectroute)
+    - [License](#license)
+    - [Author](#author)
+    - [Acknowlegement](#acknowledegement)
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
         
 
 <!-- toc -->
@@ -37,11 +55,18 @@ Wrauth is a mongoose-based restful api authentication and user management framew
 These instructions will get you a copy of Wrauth up and running on your local machine for local or production environment. Following the instructions is as simple as a cookie. 
 
 ### Prerequisites
+<<<<<<< HEAD
 * nodejs [Latest]
 * expressjs
 * mongoosejs
 * cookie-parser (if you would require stateful authentication)
 * dotenv
+=======
+* nodejs
+* expressjs
+* mongoosejs
+* cookie-parser (if you would require stateful authentication)
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 
 ### **Installation**
 Pull the package from npm.
@@ -56,6 +81,7 @@ Pull the package from npm.
 
 ```
 
+<<<<<<< HEAD
   const express = require('express');
   const mongoose = require('mongoose')
   const wrauth = require('wrauth');
@@ -66,6 +92,9 @@ Pull the package from npm.
   const app = express();
   app.use(express.json());
   app.use(cookieParser()); 
+=======
+### **Setup**
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 
 ```
 
@@ -76,6 +105,7 @@ Create a .env file and set your JWT_SECRET_KEY and JWT_EXPIRY_DATE then set in y
 
 ```
 
+<<<<<<< HEAD
   const dotenv = require('dotenv')
   dotenv.config()
 
@@ -90,6 +120,10 @@ Create a .env file and set your JWT_SECRET_KEY and JWT_EXPIRY_DATE then set in y
 
 #### **Initialize**
 The ``` .initialize() ``` method takes an optional parameter that describes the options for the auth-schema.   
+=======
+### **Initialize**
+The ```initialize()``` method takes an optional parameter that describes the options for the auth-schema.   
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 ```
   const options = {
 
@@ -105,8 +139,13 @@ The ``` .initialize() ``` method takes an optional parameter that describes the 
   wrauth.initialize(options) //wrauth.initialize()
 
 ```
+<<<<<<< HEAD
 #### **Activate**
 The ``` .activate() ``` method, well, activates the Wrauth router. This sets the router in operation.
+=======
+### **Activate**
+The ```activate()``` method, well, activates the Wrauth router. This sets the router in operation.
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 
 ```
 
@@ -115,7 +154,11 @@ The ``` .activate() ``` method, well, activates the Wrauth router. This sets the
 ```
 
 ### **Guards**
+<<<<<<< HEAD
 The ``` .guard() ``` method takes a magic string parameter that represents the type of guard. The guard is a middleware that protects the route or resource.
+=======
+The ```.guard()``` method takes a magic string parameter that represents the type of guard. The guard is a middleware that protects the route or resource.
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 
 #### **Guard Types**
 [Currently] There are two main types of guards which are middlewares. For each of the guards you can access the user from the next function as explained below.
@@ -133,9 +176,13 @@ This function protects the route by checking if the user maiking the request is 
 This function protects the route by checking if the user maiking the request is authenticated and satisfy a specific role or roles passed as a second parameter to the function. Ensure that there are no spaces between the second string parapemter and it must be in the predefined list. The roles that come with Wrauth by default are ``` 'admin' ``` and ``` 'guest' ```     
 
 ```
+<<<<<<< HEAD
 
   app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})
 
+=======
+app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
 ```
 #### Contributing
 Please read [Contributions.md](https://gist.github.com/Ralphkay/1025f03a39e42879711f731d287e2f2c) for details on our code of conduct, and the process for submitting pull requests to us.
@@ -147,4 +194,8 @@ This project is licensed under the MIT License
 Raphael Amponsah and all the graceful developers who would be contributing
 
 ### Acknowlegement
+<<<<<<< HEAD
 To God Almighty, and all through whom i have learnt, the blogs, articles, video tutorials, tweets; I am most grateful with all the Wrauth in me!
+=======
+All through whom i have learnt, the blogs, articles, video tutorials, tweets; I am most grateful with all the Wrauth in me!
+>>>>>>> c9730fcc7b6334aa341867cb491cfac8a65e231e
