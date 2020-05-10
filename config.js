@@ -1,6 +1,5 @@
 const dotenv = require('dotenv');
 dotenv.config()
-
 /**
  * Default Configuration Options
  * @object

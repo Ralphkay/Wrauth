@@ -1,6 +1,6 @@
 {
   "name": "wrauth",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Wrauth is a mongoose-based restful api authentication and user management framework, implemented for Mongoose and Mongodb based node application.",
   "main": "index.js",
   "scripts": {

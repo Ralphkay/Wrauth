@@ -9,13 +9,16 @@ Wrauth is a mongoose-based restful api authentication and user management framew
     - [Prerequisites](#prerequisites)
     - [**Installation**](#installation)
     - [**Setup**](#setup)
-        - [**Auth API Keys Setup**](#auth-api-keys-setup)
-        - [**Initialize**](#initialize)
-        - [**Activate**](#activate)
+      - [**Auth API Keys Setup**](#auth-api-keys-setup)
+      - [**Initialize**](#initialize)
+      - [**Activate**](#activate)
+    - [**Routes**](#routes)
     - [**Guards**](#guards)
       - [**Guard Types**](#guard-types)
         - [ProtectRoute](#protectroute)
         - [ProtectRouteByACL](#protectroutebyacl)
+      - [Configuration Options](#configuration-options)
+      - [TODO](#todo)
       - [Contributing](#contributing)
     - [License](#license)
     - [Author](#author)
@@ -114,6 +117,21 @@ The ``` .activate() ``` method, well, activates the Wrauth router. This sets the
 
 ```
 
+### **Routes**
+The activate function renders the follwoing list of routes
+```
+   [POST]   =>  '/register',
+   [POST]   =>  '/login',
+   [POST]   =>  '/generatepasswordresetlink',
+   [PUT]    =>  '/resetpassword/:token',
+   [POST]   =>  '/verifyemail/:token',
+   [GET]    =>  '/useraccount/',
+   [PUT]    =>  '/updateuseraccount/',
+   [PUT]    =>  '/deactivatedaccount/',
+   [DELETE] =>  '/deleteaccount/'
+
+```
+
 ### **Guards**
 The ``` .guard() ``` method takes a magic string parameter that represents the type of guard. The guard is a middleware that protects the route or resource.
 
@@ -137,6 +155,69 @@ This function protects the route by checking if the user maiking the request is 
   app.get('/show',wrauth.guard('protectRouteByACL','admin,guest'),function(req, res, next){res.json({"data":req.user})
 
 ```
+
+
+#### Configuration Options
+The configuration is comes with a host of sensible defaults and you can easily override them:
+However, it is required that you set the SMTP, emailCredentials and authSecretKeys prior to using initializing Wrauth.
+
+```
+{
+    SMTP:{
+        USER:"MAILTRAP USER",
+        PASSWORD:"MAILTRAP PASSWORD",
+        HOST:"smtp.mailtrap.io",
+        PORT:2525,
+    },
+    emailCredentials:{
+        SENDER:"Man of Wrauth",
+        SENDER_ADDRESS:"man@wrauth.com",
+        SENDER_PASSWORD:"secret",
+        PASSWORD_RESET_SUBJECT:"Password Reset Link", //default
+        CONFIRMATION_SUBJECT:"Email Confirmation"
+    },
+    authSecretKeys:{
+    JWT_SECRET_KEY:"{YOU_CAN_PUT_YOUR_KEY_HERE_OR_IN_THE_.ENV_FILE}",
+        JWT_EXPIRY_DATE:"{THE_JWT_EXPIRY_DATE}" //30d or 1d
+    },
+
+    roles:['admin', 'guest'],
+
+    schemaBooleans:{
+        useEmail:true, //default
+        useUsername:false, //default sets username to not required
+        useRoles:false
+    },
+    username:{
+        minlength:4,
+        maxlength:8
+    },
+    password:{
+        minlength:7
+    },
+    profile_photo:{
+        useProfilePhoto: false //default
+    },
+    account_status:{
+        deleteState:false, //default
+        activeState:false
+    },
+    deletionMechanism:{
+        softDeletion:true, //default
+        legacyDeletion:false //default
+    }
+}
+
+```
+
+
+#### TODO
+LoginUserWithUsername
+LoginViaOauth(google, twitter)
+SuperAdminActions
+
+
+
 #### Contributing
 Please read [Contributions.md](https://gist.github.com/Ralphkay/1025f03a39e42879711f731d287e2f2c) for details on our code of conduct, and the process for submitting pull requests to us.
 
@@ -147,4 +228,4 @@ This project is licensed under the MIT License
 Raphael Amponsah and all the graceful developers who would be contributing
 
 ### Acknowlegement
-To God Almighty, and all through whom i have learnt, the blogs, articles, video tutorials, tweets; I am most grateful with all the Wrauth in me!
+To God Almighty, and all through whom i have learnt from, the blogs, articles, video tutorials, tweets. I am most grateful with all the Wrauth in me!
