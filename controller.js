@@ -42,10 +42,10 @@ const registerUser = function(model){
         try {
             const user  = await model.create(req.body);
             if(!user){res.status(401).end("Problem with creating new user")}
-            generateEmailConfirmationLink(user, req,res, next);
-            storeTokenCookie(user,res,200,`Email confirmation link has been sent to: ${user.email} `);
+            const confirmationToken = user.getEmailConfirmationToken();
             user.save();
-            
+            generateEmailConfirmationLink(user,user.confirmationToken, req,res, next);
+            storeTokenCookie(user,res,200,`Email confirmation link has been sent to: ${user.email} `);
         } catch (error) {
             res.end(error.message)
         }
@@ -97,15 +97,19 @@ const loginUserWithEmail = function(model){
 const generatePasswordResetLink = function(model){
    return async (req, res,next)=>{
 
-        if(!req.body.email){res.status(405).end("Behold an empty email!")};
+        if(!req.body.email){res.status(401).end("Behold an empty email!")};
         try {
             const user = await model.findOne({"email":req.body.email}).select('+password');
-            if(!user){res.status(405).end("The Great Wrauth doesnt know you!")}
-            const resetToken =  user.getResetPasswordToken();
-            const resetPasswordUrl = `${req.protocol}://${req.get('host')}/user/resetpassword/${resetToken}`;
-            const message = `You are receiving this email because you (or someone else) requested the reset of a password. Please make a PUT request to:${resetPasswordUrl}`;
-            sendmail(defaultConfigOptions.emailCredentials.PASSWORD_RESET_SUBJECT,message,user.email);
+            if(!user){res.status(401).end("The Great Wrauth doesn't know you!")}
+            user.getResetPasswordToken();
             user.save();
+
+            let burl = req.baseUrl.split('/');
+            burl = burl[burl.length-1].trim();
+
+            const resetPasswordUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}/resetpassword/${user.resetPasswordToken}`;
+            const message = `<p>You are receiving this email because you (or someone else) requested the reset of a password. Please click on the link to <a href=${resetPasswordUrl}>reset your password</a></p>`;
+            sendmail(defaultConfigOptions.emailCredentials.PASSWORD_RESET_SUBJECT,message,user.email);
             res.status(200).json({user,message:`Reset password link has been sent to: ${user.email} `});
         } catch (error) {
             res.end(error.message)
@@ -128,13 +132,15 @@ const generatePasswordResetLink = function(model){
  * @param {func} callback 
  * @return async function(req,res,next)
  */
-const generateEmailConfirmationLink = async function(user, req, res){
-    
+const generateEmailConfirmationLink = async function(user,token, req, res){
+    const t = token;
     try {
-        const confirmationToken = user.getEmailConfirmationToken();
-        const confirmationUrl = `${req.protocol}://${req.get('host')}/verifyemail/${confirmationToken}`;
-        const message = `You are receiving this email because you (or someone else) sign-up with us. 
-        Please click on the following link to confirm your email to:${confirmationUrl}`;
+
+        let burl = req.baseUrl.split('/');
+        burl = burl[burl.length-1].trim();
+        const confirmationUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}/verifyemail/${t}`;
+        const message = `<p>You are receiving this email because you (or someone else) sign-up with us. 
+        Please click on the following link to confirm your email to <a href=${confirmationUrl}>verify your account</a> </p>`;
         sendmail(defaultConfigOptions.emailCredentials.CONFIRMATION_SUBJECT,message,user.email);
         
     } catch (error) {
