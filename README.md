@@ -127,7 +127,7 @@ The activate function renders the follwoing list of routes
    [POST]   =>  '/verifyemail/:token',
    [GET]    =>  '/useraccount/',
    [PUT]    =>  '/updateuseraccount/',
-   [PUT]    =>  '/deactivatedaccount/',
+   [PUT]    =>  '/deactivateaccount/',
    [DELETE] =>  '/deleteaccount/'
 
 ```
@@ -210,13 +210,10 @@ However, it is required that you set the SMTP, emailCredentials and authSecretKe
 
 ```
 
-
 #### TODO
-LoginUserWithUsername
-LoginViaOauth(google, twitter)
-SuperAdminActions
-
-
+* LoginUserWithUsername
+* LoginViaOauth(google, twitter)
+* SuperAdminActions
 
 #### Contributing
 Please read [Contributions.md](https://gist.github.com/Ralphkay/1025f03a39e42879711f731d287e2f2c) for details on our code of conduct, and the process for submitting pull requests to us.
