@@ -1,5 +1,5 @@
 'use strict';
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const {defaultConfigOptions} = require ('../config');
 
 // async..await is not allowed in global scope, must use a wrapper
