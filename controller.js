@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const sendmail = require('sendmail');
+const sendmail = require('./sendmail');
 const moment = require('moment');
 const {defaultConfigOptions} = require('./config');
 const bcrypt = require('bcryptjs');
