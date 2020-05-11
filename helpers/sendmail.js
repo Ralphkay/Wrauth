@@ -20,14 +20,14 @@ async function sendmail (subject, message, receiver) {
   });
   const sender = defaultConfigOptions.emailCredentials.SENDER;
   const senderAddress = defaultConfigOptions.emailCredentials.SENDER_ADDRESS;
-  console.log (sender, senderAddress);
+  console.log ("Email Sent!", sender, senderAddress);
   // send mail with defined transport object
   let info = await transporter.sendMail ({
     from: `"${sender}" <${senderAddress}>`,
     to: receiver, // list of receivers
     subject: subject, // Subject line
     text: message,
-    html: message, // html body
+    // html: message, // html body
   });
 
   console.log ('Message sent: %s', info.messageId);
