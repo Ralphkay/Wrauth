@@ -19,19 +19,26 @@ let defaultConfigOptions = {
         SENDER_ADDRESS:"man@wrauth.com",
         SENDER_PASSWORD:"secret",
         PASSWORD_RESET_SUBJECT:"Password Reset Link", //default
-        CONFIRMATION_SUBJECT:"Email Confirmation"
+        CONFIRMATION_SUBJECT:"Email Confirmation",
+        CONFIRMATION_TOKEN_EXPIRY_DATE:"1",
+        CONFIRMATION_TOKEN_EXPIRY_DATE_TYPE:"day", //minutes,seconds,hours
+        RESET_PASSWORD_TOKEN_EXPIRY_DATE:"1",
+        RESET_PASSWORD_TOKEN_EXPIRY_DATE_TYPE:"day" //minutes,seconds,hours
     },
     authSecretKeys:{
         JWT_SECRET_KEY:"14455936d183f3ed10821028b320a648a2a0a70ebc1cdf1cccc1910611db483b",
         JWT_EXPIRY_DATE:"30d"
     },
 
-    roles:['admin', 'guest','buyer','seller','courier'],
+    roles:['admin', 'guest'],
 
     schemaBooleans:{
         useEmail:true, //default
         useUsername:false, //default sets username to not required
-        useRoles:false
+        useRoles:false,
+        useFirstName:false,
+        useLastName: false,
+        useOtherName:false,
     },
     username:{
         minlength:4,

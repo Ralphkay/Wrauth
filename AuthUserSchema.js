@@ -25,6 +25,9 @@ const AuthUserSchema = function(options={}){
             required: options.schemaBooleans.useEmail,
             unique: true
         },
+        firstName: { type:String,required: options.schemaBooleans.useFirstName },
+        otherName: { type:String,required: options.schemaBooleans.useOtherName },
+        lastName: { type:String,required: options.schemaBooleans.useLastName },
         username:{
             type:String,
             unique:true,
@@ -63,8 +66,10 @@ const AuthUserSchema = function(options={}){
         password: { type:String,required:true,select:false, minlength:options.password.minlength },
         resetPasswordToken:{type:String,required:false},
         resetPasswordTokenExpiryDate:{type:Date, required: false},
+
         confirmationToken:{type:String,required:false},
         confirmationTokenExpiryDate:{type:Date, required: false},
+
         profile_photo:{type:String,required:options.useProfilePhoto}
     });
     authschem.pre('save',async function(next){
@@ -78,23 +83,22 @@ const AuthUserSchema = function(options={}){
 
     authschem.methods.getJwtSignedToken = function(next){
         return jwt.sign({_id:this._id},options.authSecretKeys.JWT_SECRET_KEY,{
-            expiresIn:options.authSecretKeys.JWT_EXPIRY_DATE,    
+            expiresIn:options.authSecretKeys.JWT_EXPIRY_DATE    
         });
-        next();
     }
 
     authschem.methods.getResetPasswordToken =  function(next) {
         const resetToken = crypto.randomBytes(32).toString('hex');
         this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         // set expire
-        this.resetPasswordTokenExpiryDate = moment().add('1','day');
+        this.resetPasswordTokenExpiryDate = moment().add(options.emailCredentials.RESET_PASSWORD_TOKEN_EXPIRY_DATE,options.emailCredentials.RESET_PASSWORD_TOKEN_EXPIRY_DATE_TYPE);
         return resetToken;
     }
 
     authschem.methods.getEmailConfirmationToken =  function(next) {
         const token = crypto.randomBytes(32).toString('hex');
         this.confirmationToken = crypto.createHash('sha256').update(token).digest('hex');
-        this.confirmationTokenExpiryDate = moment().add('1','day');
+        this.confirmationTokenExpiryDate = moment().add(options.emailCredentials.CONFIRMATION_TOKEN_EXPIRY_DATE,options.emailCredentials.CONFIRMATION_TOKEN_EXPIRY_DATE_TYPE);
         return token;
     }
 

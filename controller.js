@@ -5,6 +5,27 @@ const {defaultConfigOptions} = require('./config');
 const bcrypt = require('bcryptjs');
 
 
+/**
+ * storeTokenCookie
+ * ****************
+ * @function this is a helper function that faciliates the storage of a cookie token
+ * @param {Object} user instance of auth user model
+ * @param {Object} res response object
+ * @param {Number} statuscode response HTTP code
+ */
+const storeTokenCookie = (user,res,statuscode,message="")=>{
+    const options = {
+        expires: new Date(Date.now()*24*3600*30),
+        httpOnly: true
+    }
+    let token = user.getJwtSignedToken();
+    res.status(statuscode).cookie('token',token,options).json({
+        success: true,
+        data: user,
+        message
+    })
+}
+
 
 /**
  * registerUser
@@ -18,10 +39,16 @@ const bcrypt = require('bcryptjs');
  */
 const registerUser = function(model){
     return async (req, res, next)=>{
-        const user  = await model.create(req.body);
-        if(!user){res.status(401).end("Problem with creating new user")}
-        generateEmailConfirmationLink(user, req,res, next);
-        storeTokenCookie(user,res,200);
+        try {
+            const user  = await model.create(req.body);
+            if(!user){res.status(401).end("Problem with creating new user")}
+            generateEmailConfirmationLink(user, req,res, next);
+            storeTokenCookie(user,res,200,`Email confirmation link has been sent to: ${user.email} `);
+            user.save();
+            
+        } catch (error) {
+            res.end(error.message)
+        }
         next()                     
     }
 }
@@ -40,13 +67,19 @@ const loginUserWithEmail = function(model){
         if(!req.body.email || !req.body.password){
             res.status(403).end("Knight! enter thy credentials or face thy Wrauth!")
         }
-        const userExist = await model.findOne({email:req.body.email}).select('+password');
-        if(!userExist){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")};
-        if(userExist.accountStatus.active == true){userExist.accountStatus.active = false; 
-            sendmail("Account Activated!","Welcome back, you have activated your account.",userExist.email)}
-        const match =  await bcrypt.compare(req.body.password,userExist.password);
-        if(!match){return res.status(404).end("Thy credentials are not in thy testament!")};
-        storeTokenCookie(userExist,res,200)
+        try {
+            const userExist = await model.findOne({email:req.body.email}).select('+password');
+            if(!userExist){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")};
+            if(userExist.accountStatus.active == true){userExist.accountStatus.active = false; 
+                sendmail("Account Activated!","Welcome back, you have activated your account.",userExist.email)}
+            const match =  await bcrypt.compare(req.body.password,userExist.password);
+            if(!match){return res.status(404).end("Thy credentials are not in thy testament!")};
+            storeTokenCookie(userExist,res,200)
+        } catch (error) {
+            res.end(error.message)
+            
+        }
+    
         next()
     }
 }
@@ -65,14 +98,19 @@ const generatePasswordResetLink = function(model){
    return async (req, res,next)=>{
 
         if(!req.body.email){res.status(405).end("Behold an empty email!")};
-        const user = await model.findOne({"email":req.body.email}).select('+password');
-        if(!user){res.status(405).end("The Great Wrauth doesnt know you!")}
-        const resetToken =  user.getResetPasswordToken();
-        const resetPasswordUrl = `${req.protocol}://${req.get('host')}/user/resetpassword/${resetToken}`;
-        const message = `You are receiving this email because you (or someone else) requested the reset of a password. Please make a PUT request to:${resetPasswordUrl}`;
-        sendmail(defaultConfigOptions.emailCredentials.PASSWORD_RESET_SUBJECT,message,user.email);
-        user.save();
-        res.status(200).json({user});
+        try {
+            const user = await model.findOne({"email":req.body.email}).select('+password');
+            if(!user){res.status(405).end("The Great Wrauth doesnt know you!")}
+            const resetToken =  user.getResetPasswordToken();
+            const resetPasswordUrl = `${req.protocol}://${req.get('host')}/user/resetpassword/${resetToken}`;
+            const message = `You are receiving this email because you (or someone else) requested the reset of a password. Please make a PUT request to:${resetPasswordUrl}`;
+            sendmail(defaultConfigOptions.emailCredentials.PASSWORD_RESET_SUBJECT,message,user.email);
+            user.save();
+            res.status(200).json({user,message:`Reset password link has been sent to: ${user.email} `});
+        } catch (error) {
+            res.end(error.message)
+            
+        }
         next();
     }
 }
@@ -91,10 +129,17 @@ const generatePasswordResetLink = function(model){
  * @return async function(req,res,next)
  */
 const generateEmailConfirmationLink = async function(user, req, res){
-    const confirmationToken = user.getEmailConfirmationToken();
-    const confirmationUrl = `${req.protocol}://${req.get('host')}/user/confirmationlink/${confirmationToken}`;
-    const message = `You are receiving this email because you (or someone else) sign-up with us. Please make a PUT request to:${confirmationUrl}`;
-    sendmail(defaultConfigOptions.emailCredentials.CONFIRMATION_SUBJECT,message,user.email);
+    
+    try {
+        const confirmationToken = user.getEmailConfirmationToken();
+        const confirmationUrl = `${req.protocol}://${req.get('host')}/verifyemail/${confirmationToken}`;
+        const message = `You are receiving this email because you (or someone else) sign-up with us. 
+        Please click on the following link to confirm your email to:${confirmationUrl}`;
+        sendmail(defaultConfigOptions.emailCredentials.CONFIRMATION_SUBJECT,message,user.email);
+        
+    } catch (error) {
+        res.end(error.message)        
+    }
 }
 
 /**
@@ -111,22 +156,24 @@ const verifyEmail = function(model){
     return async function(req, res, next){
         const reqToken = req.params.token;
         const currentDate = moment();
-        const foundUser = await model.findOne({"confirmationToken":reqToken}).select('+password');
-        if(!foundUser){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")}
+        console.log(reqToken)
+        try {
+            const foundUser = await model.findOne({"confirmationToken":reqToken}).select('+password');
+            if(!foundUser){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")}
             // check if time has expired
             if(moment(foundUser.confirmationTokenExpiryDate)-currentDate<0){ 
                 {return res.status(404).end("Confirmation Link expired")}
             }
             foundUser.verified = true;
             foundUser.save(function (err){
-                res.status(404).end("Failue in saving: "+err.message)
-                res.status(200).json(
-            { foundUser,message:"User email verified" }
-          )
-            })
+                if(err){res.status(404).end("Failue in saving: "+err.message)}
+                res.status(200).json({ foundUser,message:"User's email verified" })
+        })
+        } catch (error) {
+            res.end(error.message)
+    }
     }
 }
-
 /**
  * resetPassword
  * *************
@@ -144,7 +191,9 @@ const resetPassword = function(model){
         }   
         const reqToken = req.params.token;
         const currentDate = moment();
-        const foundUser = await model.findOne({"resetPasswordToken":reqToken}).select('+password');
+
+        try {
+            const foundUser = await model.findOne({"resetPasswordToken":reqToken}).select('+password');
         if(!foundUser){return res.status(404).end("Hahaha! The Wrauth doesn't know you!")}
             // check if time has expired
             if(moment(foundUser.resetPasswordTokenExpiryDate)-currentDate<0){ 
@@ -155,11 +204,14 @@ const resetPassword = function(model){
             foundUser.save(function (err){
                 if(err){res.status(404).end(err.message)}else{
                     res.status(200).json(
-                { foundUser,message:"User Password: updated" }
+                { foundUser,message:"User's Password has been updated" }
               )
                 }
-              
             })
+        } catch (error) {
+            res.end(error.message)
+        }
+        
 
             
     
@@ -189,18 +241,23 @@ const getUserAccount = function(model){
            jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
                 if (err) {
                     res.status(401).end(
-                        `Aww Snap, there was something worng: ${err.message}`,
+                        `${err.message}: User may not be logged in.`,
                     );
                 }
-                model.findById(decoded._id).then(user => {
-                    res.status(200).json({ "userAccount": user });
-                    next();
-                })
-                    .catch(err => {
-                        res.status(401).end(
-                            `Not authorised ${err.message}`,
-                        );
-                    });
+                if (decoded) {
+                    model.findById(decoded._id).then(user => {
+                        res.status(200).json({ "userAccount": user });
+                        next();
+                    })
+                        .catch(err => {
+                            res.status(401).end(
+                                `Not authorised ${err.message}`,
+                            );
+                        });
+                }else{
+                    res.end("Not authorised, invalid key")
+                }
+                
             });
        }
    }
@@ -243,13 +300,13 @@ const updateUserAccount = function(model){
                if(err){
                res.status(403).end("Jogger, there was an error in saving: "+err.message)
             }else{
-                res.status(200).json({user})
+                res.status(200).json({user, "message":"User account updated!"})
     
             }
             
         })
        } catch (error) {
-           res.status(408).end("There was a fatal error: "+error.message)
+           res.status(401).end("There was a fatal error: "+error.message)
        }
     }
     }
@@ -279,27 +336,32 @@ const deactivateUserAccount = function(model){
         jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
              if (err) {
                  res.status(401).json({
-                     message: `Aww Snap, there was something worng: ${err.message}`,
+                     message: `User may not be logged in: ${err.message}`,
                  });
              }
-             model.findById(decoded._id).then(user => {
-                if(user.deletionMechanism.legacyDeletion == false){
-                     user.accountStatus.active = false;
-                     sendmail("Account Deactivated!","Sometimes it is good to take a break from us, hope to see you soon!",user.email);
-                }
-                user.save((err)=>{           
-                    if (err) {
-                        res.status(401).end(`Aww Snap, there was something worng: ${err.message}`,
-                        );
+             if(decoded){
+                model.findById(decoded._id).then(user => {
+                    if(user.deletionMechanism.legacyDeletion == false){
+                         user.accountStatus.active = false;
+                         sendmail("Account Deactivated!","Sometimes it is good to take a break from us, hope to see you soon!",user.email);
                     }
-                    // res.status(204).json({message:"User deactivated successfully"})
-                });
-                res.status(200).json({ "userAccount": user });
-                 next();
-             }).catch(err => {
-                     res.status(401).end( `Not authorised ${err.message}`,
-                     );
-                 });
+                    user.save((err)=>{           
+                        if (err) {
+                            res.status(401).end(`Aww Snap, there was something worng: ${err.message}`,
+                            );
+                        }
+                        // res.status(204).json({message:"User deactivated successfully"})
+                    });
+                    res.status(200).json({ "userAccount": user,"message":"user account deactivated!" });
+                     next();
+                 }).catch(err => {
+                         res.status(401).end( `Not authorised ${err.message}`,
+                         );
+                     });
+             }else{
+                 res.end("User may not be logged")
+             }
+            
          });
     }
 }
@@ -331,52 +393,36 @@ const deleteUserAccount = function(model){
     
         jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
              if (err) {
-                 res.status(401).end( `Aww Snap, there was something worng: ${err.message}`,
+                 res.status(401).end( `User may not be authorised or logged in: ${err.message}`,
                  );
              }
-             model.findById(decoded._id).then(user => {
-                 user.accountStatus.deleted = true;
-                 if(user.deletionMechanism.legacyDeletion == true){
-                     model.deleteOne({_id:decoded._id});
-                     sendmail("Oh no! Account Deleted!","Sorry you had to leave, you have deleted your account. can you please complete this survey to tell us why?",user.email);
-                 }
-                 user.save((err)=>{
-                     err?res.status(401).end("Error in saving"):res.status(204).json({message:"User deleted successfully"})
-                 });
-    
-    
-                 res.status(200).json({ "userAccount": user });
-                 next();
-             })
-                 .catch(err => {
-                     res.status(401).json({
-                         message: `Not authorised ${err.message}`,
-                     });
-                 });
+            if(decoded){
+                model.findById(decoded._id).then(user => {
+                    user.accountStatus.deleted = true;
+                    if(user.deletionMechanism.legacyDeletion == true){
+                        model.deleteOne({_id:decoded._id});
+                        sendmail("Oh no! Account Deleted!","Sorry you had to leave, you have deleted your account. can you please complete this survey to tell us why?",user.email);
+                    }
+                    user.save((err)=>{
+                        err?res.status(401).end("Error in saving"):res.status(204).json({message:"User deleted successfully"})
+                    });
+       
+       
+                    res.status(200).json({ "userAccount": user });
+                    next();
+                })
+                    .catch(err => {
+                        res.status(401).json({
+                            message: `User may not be authorised or logged in ${err.message}`,
+                        });
+                    });
+            }else{
+                res.end("User may not be authorised or logged in")
+            }
          });
     }
     
     }
-}
-
-/**
- * storeTokenCookie
- * ****************
- * @function this is a helper function that faciliates the storage of a cookie token
- * @param {Object} user instance of auth user model
- * @param {Object} res response object
- * @param {Number} statuscode response HTTP code
- */
-function storeTokenCookie(user,res,statuscode){
-    const options = {
-        expires: new Date(Date.now()*24*3600*30),
-        httpOnly: true
-    }
-    let token = user.getJwtSignedToken();
-    res.status(statuscode).cookie('token',token,options).json({
-        success: true,
-        data: user
-    })
 }
 
 

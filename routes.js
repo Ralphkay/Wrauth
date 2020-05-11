@@ -20,7 +20,7 @@ const authRoutes = function(model){
       authRouter.route('/verifyemail/:token').put(authCtrl(model).verifyEmail);
       authRouter.route('/useraccount/').get(authCtrl(model).getUserAccount);
       authRouter.route('/updateuseraccount/').put(authCtrl(model).updateUserAccount);
-      authRouter.route('/deactivatedaccount/').put(authCtrl(model).deactivateUserAccount);
+      authRouter.route('/deactivateaccount/').put(authCtrl(model).deactivateUserAccount);
       authRouter.route('/deleteaccount/').delete(authCtrl(model).deleteUserAccount);
       return authRouter;
 }
