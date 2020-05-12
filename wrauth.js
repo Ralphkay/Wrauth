@@ -1,11 +1,12 @@
 //ts
-const {defaultConfigOptions} = require('./config');
+const {
+    defaultConfigOptions
+} = require('./config');
 const mongoose = require('mongoose');
 const routeMiddlewares = require('./guards')
 const authRoutes = require('./routes');
 const merge = require('merge-deep');
-
-
+const cookieParser = require('cookie-parser')
 /**
  * Wrauth
  * ******
@@ -29,8 +30,8 @@ app.get('/home',wrauth.guard('protectRouteByACL','admin,guest'),function(req, re
  * 
  */
 const wrauth = {
-    plodel:{},
-    op:{},
+    plodel: {},
+    op: {},
     /**
      * Initializes Wrauth
      * ******************
@@ -45,14 +46,13 @@ const wrauth = {
      * @param {Object} options
      * @returns {Model} model
      */
-    initialize:function(options={}){
-        options = merge(options,defaultConfigOptions)
+    initialize: function (options = {}) {
+        options = merge(options, defaultConfigOptions)
         this.op = options;
         const AuthUserSchema = require('./AuthUserSchema');
         const AuthModel = mongoose.model('AuthUser', AuthUserSchema(options));
         return this.plodel = AuthModel;
     },
-
     /**
      * The Wrauth Router Activator
      * ***********************
@@ -61,10 +61,9 @@ const wrauth = {
      * so that you can easily access the auth user model.
      * @returns {Router} WrauthRouter - the Wrauth Router
      */
-    activate:function(){
+    activate: function () {
         return authRoutes(this.plodel)
     },
-
     /**
      * The Wrauth Guard 
      * ****************
@@ -91,29 +90,15 @@ const wrauth = {
      * 
      * 
      */
-    guard:function(guardName,roles){
-         switch (guardName){
+    guard: function (guardName, roles) {
+        switch (guardName) {
             case 'protectRoute':
                 return routeMiddlewares.protectRoute(this.plodel);
             case 'protectRouteByACL':
-                return routeMiddlewares.protectRouteByACL(this.plodel,this.op)(roles);
+                return routeMiddlewares.protectRouteByACL(this.plodel, this.op)(roles);
             default:
-        return false;
-
+                return false;
         }
-            
     }
-    
 }
-
-
-
-
-
-
-
 module.exports = wrauth;
-
-
-
-
