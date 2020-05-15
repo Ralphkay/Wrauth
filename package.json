@@ -1,13 +1,12 @@
 {
   "name": "wrauth",
-  "version": "2.0.5",
-  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
+  "version": "2.1.5",
   "description": "Wrauth is a mongoose-based restful api authentication and user management framework, implemented for Mongoose and Mongodb based node application.",
   "main": "index.js",
   "scripts": {
     "start": "clear && nodemon index.js"
   },
-  "keywords": ["wrauth","auth","user-management","mongoose-auth"],
+  "keywords": ["wrauth", "auth", "user-management", "mongoose-auth"],
   "author": "Raphael Amponsah",
   "license": "MIT",
   "dependencies": {
