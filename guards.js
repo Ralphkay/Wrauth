@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const guards = {
     protectRouteByACL: function (model, defRoles) {
         return async function (req, res, next) {
-            console.log("protectRouteByACL");
             // if (
             //     req.headers.authorization &&
             //     req.headers.authorization.startsWith('Bearer')
@@ -12,7 +11,6 @@ const guards = {
 
             try {
                 token = req.cookies.token;
-                console.log(token)
             } catch (error) {
                 res.status(401).end(`User may not be logged in: token  not set ${error.message}`)
             }

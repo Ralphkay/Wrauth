@@ -166,7 +166,6 @@ const verifyEmail = function (model) {
     return async function (req, res, next) {
         const reqToken = req.params.token;
         const currentDate = moment();
-        console.log(reqToken)
         try {
             const foundUser = await model.findOne({
                 "confirmationToken": reqToken
