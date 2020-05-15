@@ -33,9 +33,9 @@ const AuthUserSchema = function (options = {}) {
             type: String,
             required: options.schemaBooleans.useLastName
         },
-        username: {
+        usernameField: {
             type: String,
-            unique: true,
+            unique: options.schemaBooleans.useUsername,
             minlength: options.username.minlength,
             maxlength: options.username.maxlength,
             required: options.schemaBooleans.useUsername

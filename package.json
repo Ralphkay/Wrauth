@@ -1,6 +1,7 @@
 {
   "name": "wrauth",
-  "version": "2.0.4",
+  "version": "2.0.5",
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "description": "Wrauth is a mongoose-based restful api authentication and user management framework, implemented for Mongoose and Mongodb based node application.",
   "main": "index.js",
   "scripts": {
