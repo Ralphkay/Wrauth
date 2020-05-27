@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const defaultOptions = require('./config');
+const {defaultConfigOptions} = require('./config');
 const guards = {
     protectRouteByACL: function (model, defRoles) {
         return async function (req, res, next) {
@@ -19,7 +19,7 @@ const guards = {
             }
 
             try {
-                jwt.verify(token, defaultOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                jwt.verify(token, defaultConfigOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`${err.message}: User may not be logged in.`);
                     }
@@ -68,7 +68,7 @@ const guards = {
                 }
             }
             try {
-                await jwt.verify(token, defaultOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                await jwt.verify(token, defaultConfigOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`User may not be logged in--> Error message: ${err.message, err.stack}:(`);
                     }
