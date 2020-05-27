@@ -1,8 +1,11 @@
 const jwt = require('jsonwebtoken');
-const {defaultConfigOptions} = require('./config');
+const {
+    defaultConfigOptions
+} = require('./config');
 const guards = {
-    protectRouteByACL: function (model, defRoles) {
+    protectRouteByACL: function (model, defRoles, options) {
         return async function (req, res, next) {
+
             let token = "";
             if (
                 req.headers.authorization &&
@@ -12,14 +15,17 @@ const guards = {
             }
 
             try {
-                
-                const {token} = req.cookies;
+
+                const {
+                    token
+                } = req.cookies;
             } catch (error) {
                 res.status(401).end(`User may not be logged in: token  not set ${error.message}`)
             }
 
             try {
-                jwt.verify(token, defaultConfigOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                  console.log(options.authSecretKeys.JWT_SECRET_KEY);
+                jwt.verify(token, options.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`${err.message}: User may not be logged in.`);
                     }
@@ -52,7 +58,7 @@ const guards = {
             }
         }
     },
-    protectRoute: function (model) {
+    protectRoute: function (model, options) {
         return async function (req, res, next) {
             let token = null;
             if (
@@ -68,7 +74,7 @@ const guards = {
                 }
             }
             try {
-                await jwt.verify(token, defaultConfigOptions.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                await jwt.verify(token, options.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`User may not be logged in--> Error message: ${err.message, err.stack}:(`);
                     }
