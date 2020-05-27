@@ -11,8 +11,8 @@ const guards = {
             }
 
             try {
-                console.log(req.cookies)
-                token = req.cookies.token;
+                
+                const {token} = req.cookies;
             } catch (error) {
                 res.status(401).end(`User may not be logged in: token  not set ${error.message}`)
             }
