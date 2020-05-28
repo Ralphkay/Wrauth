@@ -1,31 +1,22 @@
 const jwt = require('jsonwebtoken');
-const {
-    defaultConfigOptions
-} = require('./config');
 const guards = {
-    protectRouteByACL: function (model, defRoles, options) {
+    protectRouteByACL: function (model, defRoles) {
         return async function (req, res, next) {
-
-            let token = "";
-            if (
-                req.headers.authorization &&
-                req.headers.authorization.startsWith('Bearer')
-            ) {
-                token = req.headers.authorization.split(' ')[1];
-            }
+            // if (
+            //     req.headers.authorization &&
+            //     req.headers.authorization.startsWith('Bearer')
+            // ) {
+            //     token = req.headers.authorization.split(' ')[1];
+            // }
 
             try {
-
-                const {
-                    token
-                } = req.cookies;
+                token = req.cookies.token;
             } catch (error) {
                 res.status(401).end(`User may not be logged in: token  not set ${error.message}`)
             }
 
             try {
-                  console.log(options.authSecretKeys.JWT_SECRET_KEY);
-                jwt.verify(token, options.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`${err.message}: User may not be logged in.`);
                     }
@@ -34,7 +25,7 @@ const guards = {
                         model.findById(decoded._id, function (err, user) {
                             if (err) {
                                 res.status(404).json({
-                                    message: `User not found: ${err}`
+                                    message: `${err}`
                                 })
                             }
                             const {
@@ -58,7 +49,7 @@ const guards = {
             }
         }
     },
-    protectRoute: function (model, options) {
+    protectRoute: function (model) {
         return async function (req, res, next) {
             let token = null;
             if (
@@ -74,7 +65,7 @@ const guards = {
                 }
             }
             try {
-                await jwt.verify(token, options.authSecretKeys.JWT_SECRET_KEY, function (err, decoded) {
+                await jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
                     if (err) {
                         res.status(401).end(`User may not be logged in--> Error message: ${err.message, err.stack}:(`);
                     }

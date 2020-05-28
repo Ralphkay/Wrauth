@@ -47,8 +47,9 @@ const wrauth = {
      * @returns {Model} model
      */
     initialize: function (options = {}) {
-        options = merge(options, defaultConfigOptions)
+        options = merge(defaultConfigOptions, options)
         this.op = options;
+        console.log(this.op)
         const AuthUserSchema = require('./AuthUserSchema');
         const AuthModel = mongoose.model('AuthUser', AuthUserSchema(options));
         return this.plodel = AuthModel;
@@ -93,7 +94,7 @@ const wrauth = {
     guard: function (guardName, roles) {
         switch (guardName) {
             case 'protectRoute':
-                return routeMiddlewares.protectRoute(this.plodel,this.op);
+                return routeMiddlewares.protectRoute(this.plodel);
             case 'protectRouteByACL':
                 const defRoles = roles.split(',');
                 let isValidRole = defRoles.every((val) => {
@@ -102,7 +103,7 @@ const wrauth = {
                 if (!isValidRole) {
                     throw new Error("ACL middleware second parameter(role) not valid/not in predefined list");
                 }
-                return routeMiddlewares.protectRouteByACL(this.plodel, defRoles,this.op);
+                return routeMiddlewares.protectRouteByACL(this.plodel, defRoles);
             default:
                 return false;
         }

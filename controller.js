@@ -73,8 +73,8 @@ const loginUserWithEmail = function (model) {
             if (!userExist) {
                 return res.status(404).end("Hahaha! The Wrauth doesn't know you!")
             };
-            if (userExist.accountStatus.active == true) {
-                userExist.accountStatus.active = false;
+            if (userExist.accountStatus.active != true) {
+                userExist.accountStatus.active = true;
                 sendmail("Account Activated!", "Welcome back, you have activated your account.", userExist.email)
             }
             const match = await bcrypt.compare(req.body.password, userExist.password);
