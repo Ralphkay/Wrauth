@@ -49,7 +49,6 @@ const wrauth = {
     initialize: function (options = {}) {
         options = merge(defaultConfigOptions, options)
         this.op = options;
-        console.log(this.op)
         const AuthUserSchema = require('./AuthUserSchema');
         const AuthModel = mongoose.model('AuthUser', AuthUserSchema(options));
         return this.plodel = AuthModel;
