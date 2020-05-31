@@ -93,7 +93,7 @@ const wrauth = {
     guard: function (guardName, roles) {
         switch (guardName) {
             case 'protectRoute':
-                return routeMiddlewares.protectRoute(this.plodel);
+                return routeMiddlewares.protectRoute(this.plodel, this.op);
             case 'protectRouteByACL':
                 const defRoles = roles.split(',');
                 let isValidRole = defRoles.every((val) => {
@@ -102,9 +102,9 @@ const wrauth = {
                 if (!isValidRole) {
                     throw new Error("ACL middleware second parameter(role) not valid/not in predefined list");
                 }
-                return routeMiddlewares.protectRouteByACL(this.plodel, defRoles);
+                return routeMiddlewares.protectRouteByACL(this.plodel, defRoles, this.op);
             default:
-                return false;
+                return routeMiddlewares.protectRoute(this.plodel);
         }
     }
 }
